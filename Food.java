@@ -2,13 +2,13 @@ package mealplanning;
 //The purpose of this class is to represent a food item.
 public class Food {
 
-	// These represent the instance variables for food. 
+	//These represent the instance variables for food. 
 	private String name;
 	private String category;
 	private String quanity;
 	private int calories;
 
-	// This is the constructor. 
+	//This is the constructor. 
 	public Food(String name, String category, String quanity, int calories) {
 		this.name = name;
 		this.category = category;
