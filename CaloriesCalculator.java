@@ -23,38 +23,50 @@ public class CaloriesCalculator {
 		while(true) {
 
 			// System output for selecting the gender. 
-			//equalsIgnoreCase compares two strings while ignoring if it is capitalized or lower case.
+			//equalsIgnoreCase method compares two strings while ignoring if it is capitalized or lower case.
+			//method will return true if not equal to null and represents equiv. string ignoring case. 
 			System.out.print("Enter gender ('m' for male and 'f' for female): ");
 			boolean male = scanner.next().equalsIgnoreCase("m");
+			//even with ignoring cases both strings are not equal. 
 			
-			// read target
+			// Read the target for what your goal with weight is.
+			//Scans the next token of the input as an int
 			System.out.print("Enter target (1. Lose Weight 2. Maintain Weight 3. Gain Weight): ");
 			int target = scanner.nextInt();
+			//Returns the int scanned from the input.
 			
 			
-			// calculate calories and per meal limit
+			//This is where we calculate both the calories and per meal limit.
+			//get maximum Calories from the 
 			int maxCalories = getMaximumCalories(male, target);
 			int perMealLimit = Math.floorDiv(maxCalories, MEALS.length);
+			//Math.floorDiv is a build-in math function that returns the largest int value that is less or equal to the algebraic quotient. 
 			
-			// get full day meal and divide to meals
+
+			//Get the full day meal and then it is going to divide it meals
+			//We are using a resizable-array implementation of the list interface. 
 			ArrayList<Food> meal = getFullDayMeal(maxCalories, db);
 			ArrayList<Food>[] meals = divideToMeals(meal, perMealLimit);
 			
 			
-			// print results
+			//This is where the results will be printed
 			System.out.printf("\nMaximum Calories: %d, Per Meal Limit: %d\n", maxCalories , perMealLimit);
 			for (int j = 0; j < meals.length; j++) {
+				//.length is used to find the size of a single dimension array
+				// j++ --> j=j+1
 				System.out.printf("\n%s [%d calories]:\n", MEALS[j], totalCalories(meals[j]));
+				//Shows the meals and how many calories everything has. 
 				for (Food food : meals[j]) {
 					System.out.println(food);
 				}
 			}
 			
 			
-			// ask if user wnats to exit
-			System.out.print("\nDo you want to exit? [y/N]: ");
+			//Ask the user if they would like to exit. 
+			System.out.print("\nDo you want to exit? [y/n]: ");
 			if(scanner.next().equalsIgnoreCase("y"))
 				break;
+			//If the user says yes then the loop ends. 
 			
 			System.out.println();
 		}
@@ -69,7 +81,9 @@ public class CaloriesCalculator {
 	}
 	
 	
-	// get maximum calories based on geneder and target
+	// Get the maximum calorie amount based on the gender and also the target.
+	//males trying to lose weight max calories = 2000. males trying to maintain weight max calories = 2500. Males trying to gain weight max calories = 3000
+	//females trying to lose weight the max calories = 1500. Females trying to maintain weight the max calories = 2000. 
 	private static int getMaximumCalories(boolean male, int target) {
 		if(target == LOSE_WEIGHT)
 			return male ? 2000 : 1500;
@@ -83,12 +97,12 @@ public class CaloriesCalculator {
 	
 	
 	
-	// divide a full day meal to meals
+	//This divides a full day's meal into separate meals
 	private static ArrayList<Food>[] divideToMeals(ArrayList<Food> fullDayMeal, int perMealMaxCalories) {
-		ArrayList<Food>[] meals = new ArrayList[MEALS.length]; // to sotre meals
+		ArrayList<Food>[] meals = new ArrayList[MEALS.length]; // This is to store the actual meals
 		
 		
-		// create array to keep track of remianing calories for the meal
+		//This creates array to keep track of the remaining calories for the meal
 		int[] remainingCalories = new int[MEALS.length];
 		for (int i = 0; i < remainingCalories.length; i++) {
 			remainingCalories[i] = perMealMaxCalories;
@@ -99,13 +113,13 @@ public class CaloriesCalculator {
 	
 		
 		while(!fullDayMeal.isEmpty()) {
-			// remove first food
+			// This removes the first food
 			Food food = fullDayMeal.remove(0);
 			
-			if(canAddToMeal(food.getCalories(), remainingCalories)) { // check if can be added
+			if(canAddToMeal(food.getCalories(), remainingCalories)) { // This checks to see if a food can be added based on the amount of calories
 				boolean added = false;
 				
-				// if any meal is empty, add to that so that no meal rem,ains empty at end
+				// If any meal is empty, add to it so that there is no meal that will be empty at end.
 				for (int i = 0; i < meals.length; i++) {
 					if(meals[i].isEmpty()) {
 						meals[i].add(food);
@@ -116,9 +130,9 @@ public class CaloriesCalculator {
 				}
 				
 				
-				// if no meal was empt
+				// If there is no meal that is empty
 				while(!added) {
-					// find a random meal where it can be added
+					// Find a random meal where it can be added
 					int meal = random.nextInt(meals.length);
 					if(remainingCalories[meal] >= food.getCalories()) {
 						meals[meal].add(food);
@@ -137,7 +151,7 @@ public class CaloriesCalculator {
 	}
 	
 	
-	// check if there is a meal which can accomodate given calories
+	//This checks to see if there is a meal with can accommodate the given calories
 	private  static boolean canAddToMeal(int calories, int[] remainingCalories) {
 		for (int i = 0; i < remainingCalories.length; i++) {
 			if(calories <= remainingCalories[i])
@@ -148,7 +162,7 @@ public class CaloriesCalculator {
 	}
 	
 	
-	// calculate total calories in a food
+	// This calculates the total calories in a meal. 
 	private static int totalCalories(ArrayList<Food> meal) {
 		int total = 0;
 		for (Food food : meal) {
@@ -158,7 +172,7 @@ public class CaloriesCalculator {
 		return total;
 	}
 	
-	// get full day meal
+	// Get a full days meal
 	private static ArrayList<Food> getFullDayMeal(int caloriesLimit, Food[][] db) {
 		while(true) {
 			ArrayList<Food> fullDayMeal = randomizeFullDayMeal(caloriesLimit, db);
@@ -167,15 +181,14 @@ public class CaloriesCalculator {
 		}
 	}
 	
-	
-	// randomizes full day meal to meet the target
-	// if any step fail, it returns null
+	//This randomizes a full days meal to meet the target.
+	//If any step fails it returns to null.
 	private  static ArrayList<Food> randomizeFullDayMeal(int caloriesLimit, Food[][] db) {
 		
 		ArrayList<Food> foods = new ArrayList<>();
 		int remainingLimit = caloriesLimit;
 		
-		// add atleats one food of each category
+		// Add at least one food of each category
 		for (int i = 0; i < CATEGORIES.length; i++) {
 			Food food = findFood(remainingLimit, db[i]);
 			
@@ -187,7 +200,7 @@ public class CaloriesCalculator {
 		}
 		
 		
-		// add more foods so that the total claories is as close to the limit
+		//This will add more foods so that the total calories is as close to the limit as possible.
 		while(exists(remainingLimit, db)) {
 			int categrory = random.nextInt(CATEGORIES.length);
 			Food food = findFood(remainingLimit, db[categrory]);
@@ -205,12 +218,12 @@ public class CaloriesCalculator {
 		
 	}
 	
-	// find a food in a categpry of food that meets the target
+	//Find a food in a category of the food that will meet the target.
 	private  static Food findFood(int maxCalories, Food[] foods) {
-		if(!exists(maxCalories, foods)) // if no such food exists
+		if(!exists(maxCalories, foods)) //If no such food exist
 			return null;
 		
-		// find a random food and add
+		//Find a random food andd add
 		while(true) {
 			int index = random.nextInt(foods.length);
 			if(foods[index].getCalories() <= maxCalories)
@@ -219,7 +232,7 @@ public class CaloriesCalculator {
 	}
 	
 	
-	// check if there ecists atleast one food that meets the calories limit
+	//Check to see if there exists at least one food that will meet the calorie limit
 	private  static boolean exists(int maxCalories, Food[] foods) {
 		for (int i = 0; i < foods.length; i++) {
 			if(foods[i].getCalories() <= maxCalories)
@@ -230,7 +243,7 @@ public class CaloriesCalculator {
 	}
 	
 	
-	// check if there is atleast one food in whole database that meets the calories limit
+	//This checks to see if there is at least one food in the entire database that will meet the calorie limit.
 	private  static boolean exists(int maxCalories, Food[][] db) {
 		for (int i = 0; i < db.length; i++) {
 			if(exists(maxCalories, db[i]))
@@ -243,7 +256,7 @@ public class CaloriesCalculator {
 	
 	
 	
-	// create database of food
+	// This is the actual database for the food. 
 	public static Food[][] createDatabase() {
 		Food[][] foods = new Food[CATEGORIES.length][];
 		
